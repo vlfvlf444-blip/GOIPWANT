@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관리자 — 희망학교 조사서 현황</title>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Round+Square:wght@400;700;800;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary:#4F6DF5; --primary-light:#E8EEFF; --primary-dark:#2E4BCC;
+  --accent:#FF6B6B; --success:#22C55E; --success-light:#E8FFF0;
+  --warning:#F59E0B; --warning-light:#FFFBEB;
+  --bg:#F7F8FF; --card:#FFFFFF; --text:#1E2340;
+  --text-sub:#5A6080; --text-muted:#9AA0BE; --border:#E8ECFF;
+  --radius:16px; --radius-sm:10px;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Noto Sans KR',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+/* HEADER */
+.header { background:linear-gradient(135deg,#1E40AF,#4F6DF5); color:white; padding:28px 24px; }
+.header-inner { max-width:960px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+.header h1 { font-family:'Nanum Round Square',sans-serif; font-size:22px; font-weight:900; }
+.header p  { font-size:13px; opacity:.85; margin-top:4px; }
+.header-badge { background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3); border-radius:100px; padding:5px 14px; font-size:12px; font-weight:700; }
+
+/* LOGIN */
+#login-screen { display:flex; align-items:center; justify-content:center; min-height:70vh; padding:24px; }
+.login-card { background:var(--card); border-radius:var(--radius); border:2px solid var(--primary); padding:40px 32px; width:100%; max-width:380px; text-align:center; }
+.login-card .lock { font-size:48px; margin-bottom:16px; }
+.login-card h2 { font-family:'Nanum Round Square',sans-serif; font-size:20px; font-weight:900; margin-bottom:6px; }
+.login-card p  { font-size:13px; color:var(--text-sub); margin-bottom:24px; }
+.login-card input { width:100%; padding:13px 16px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-size:16px; font-family:'Noto Sans KR',sans-serif; text-align:center; letter-spacing:4px; outline:none; margin-bottom:14px; transition:border-color .18s; }
+.login-card input:focus { border-color:var(--primary); }
+.login-card .btn-login { width:100%; padding:14px; background:var(--primary); color:white; border:none; border-radius:100px; font-size:16px; font-weight:700; cursor:pointer; font-family:'Noto Sans KR',sans-serif; transition:background .18s; }
+.login-card .btn-login:hover { background:var(--primary-dark); }
+.login-error { color:var(--accent); font-size:13px; margin-top:10px; display:none; }
+
+/* MAIN */
+#admin-screen { display:none; }
+.main { max-width:960px; margin:0 auto; padding:28px 16px 64px; }
+
+/* STATS */
+.stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:14px; margin-bottom:28px; }
+.stat-card { background:var(--card); border-radius:var(--radius-sm); border:1px solid var(--border); padding:18px; text-align:center; }
+.stat-card .num { font-family:'Nanum Round Square',sans-serif; font-size:32px; font-weight:900; margin-bottom:4px; }
+.stat-card .lbl { font-size:12px; color:var(--text-muted); font-weight:700; }
+.stat-card.blue .num { color:var(--primary); }
+.stat-card.green .num { color:var(--success); }
+.stat-card.purple .num { color:#7C3AED; }
+.stat-card.orange .num { color:var(--warning); }
+
+/* TOOLBAR */
+.toolbar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:16px; }
+.toolbar input[type="text"] { flex:1; min-width:160px; padding:10px 14px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-size:14px; font-family:'Noto Sans KR',sans-serif; background:var(--bg); color:var(--text); outline:none; }
+.toolbar input[type="text"]:focus { border-color:var(--primary); }
+.toolbar select { padding:10px 14px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-size:14px; font-family:'Noto Sans KR',sans-serif; background:var(--bg); color:var(--text); outline:none; cursor:pointer; }
+.btn-sm { padding:10px 18px; border-radius:100px; font-size:13px; font-weight:700; cursor:pointer; border:none; font-family:'Noto Sans KR',sans-serif; display:inline-flex; align-items:center; gap:5px; transition:all .18s; }
+.btn-primary { background:var(--primary); color:white; }
+.btn-primary:hover { background:var(--primary-dark); }
+.btn-danger { background:#FEF2F2; color:#DC2626; border:1.5px solid #FECACA; }
+.btn-danger:hover { background:#FEE2E2; }
+.btn-outline { background:white; color:var(--primary); border:1.5px solid var(--primary); }
+.btn-outline:hover { background:var(--primary-light); }
+
+/* TABLE */
+.table-wrap { background:var(--card); border-radius:var(--radius); border:1px solid var(--border); overflow:hidden; }
+table { width:100%; border-collapse:collapse; font-size:14px; }
+thead th { background:var(--primary); color:white; padding:12px 14px; text-align:left; font-weight:700; font-size:13px; white-space:nowrap; }
+tbody tr { border-bottom:1px solid var(--border); cursor:pointer; transition:background .15s; }
+tbody tr:last-child { border-bottom:none; }
+tbody tr:hover { background:var(--primary-light); }
+tbody td { padding:12px 14px; vertical-align:middle; }
+.badge { display:inline-block; padding:3px 10px; border-radius:100px; font-size:11px; font-weight:700; }
+.badge-m { background:#DBEAFE; color:#1E40AF; }
+.badge-f { background:#FCE7F3; color:#BE185D; }
+.school-chips { display:flex; flex-wrap:wrap; gap:4px; }
+.school-chip { background:var(--primary-light); color:var(--primary-dark); border-radius:100px; padding:2px 8px; font-size:11px; font-weight:700; }
+.time-txt { font-size:12px; color:var(--text-muted); }
+.del-btn { background:none; border:none; cursor:pointer; color:var(--text-muted); font-size:16px; padding:4px 8px; border-radius:6px; transition:color .15s,background .15s; }
+.del-btn:hover { color:var(--accent); background:#FFF5F5; }
+
+/* EMPTY */
+.empty { text-align:center; padding:64px 24px; }
+.empty .e-icon { font-size:48px; margin-bottom:12px; }
+.empty p { font-size:15px; color:var(--text-muted); }
+
+/* DETAIL MODAL */
+.modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:100; align-items:center; justify-content:center; padding:16px; }
+.modal-bg.open { display:flex; }
+.modal { background:var(--card); border-radius:var(--radius); padding:28px; width:100%; max-width:480px; position:relative; max-height:90vh; overflow-y:auto; }
+.modal-close { position:absolute; top:16px; right:16px; background:var(--bg); border:none; border-radius:8px; width:32px; height:32px; cursor:pointer; font-size:18px; color:var(--text-sub); display:flex; align-items:center; justify-content:center; }
+.modal-close:hover { background:var(--border); }
+.modal h3 { font-family:'Nanum Round Square',sans-serif; font-size:18px; font-weight:900; margin-bottom:18px; padding-bottom:14px; border-bottom:2px solid var(--primary); }
+.modal .info-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); font-size:14px; }
+.modal .info-row:last-of-type { border-bottom:none; }
+.modal .info-label { color:var(--text-muted); font-size:13px; }
+.modal .info-val { font-weight:700; }
+
+/* LOGOUT */
+.logout-btn { background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3); color:white; border-radius:100px; padding:7px 16px; font-size:13px; font-weight:700; cursor:pointer; font-family:'Noto Sans KR',sans-serif; }
+.logout-btn:hover { background:rgba(255,255,255,.28); }
+
+@media (max-width:600px) {
+  thead th:nth-child(4), tbody td:nth-child(4),
+  thead th:nth-child(5), tbody td:nth-child(5) { display:none; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div>
+      <div class="header-badge">🔒 관리자 전용</div>
+      <h1 style="margin-top:8px;">희망학교 조사서 현황</h1>
+      <p>2027학년도 고등학교 입학 · 경남 김해시 4학군</p>
+    </div>
+    <button class="logout-btn" onclick="doLogout()">로그아웃</button>
+  </div>
+</div>
+
+<!-- 로그인 -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="lock">🔐</div>
+    <h2>관리자 로그인</h2>
+    <p>관리자 비밀번호를 입력해주세요</p>
+    <input type="password" id="pw-input" placeholder="비밀번호" maxlength="20" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn-login" onclick="doLogin()">로그인</button>
+    <div class="login-error" id="login-error">비밀번호가 올바르지 않습니다.</div>
+  </div>
+</div>
+
+<!-- 관리자 화면 -->
+<div id="admin-screen">
+  <div class="main">
+
+    <!-- 통계 -->
+    <div class="stats" id="stats-area"></div>
+
+    <!-- 툴바 -->
+    <div class="toolbar">
+      <input type="text" id="search-input" placeholder="🔍  이름 또는 학교명 검색..." oninput="renderTable()">
+      <select id="gender-filter" onchange="renderTable()">
+        <option value="">전체 성별</option>
+        <option value="남학생">남학생</option>
+        <option value="여학생">여학생</option>
+      </select>
+      <button class="btn-sm btn-outline" onclick="exportCSV()">📥 CSV 내보내기</button>
+      <button class="btn-sm btn-danger" onclick="clearAll()">🗑️ 전체 삭제</button>
+    </div>
+
+    <!-- 테이블 -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:40px;">#</th>
+            <th>이름</th>
+            <th>성별</th>
+            <th>학번</th>
+            <th>출신 중학교</th>
+            <th>희망 학교</th>
+            <th>제출일시</th>
+            <th style="width:40px;"></th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+      <div class="empty" id="empty-msg" style="display:none;">
+        <div class="e-icon">📭</div>
+        <p>아직 제출된 조사서가 없습니다.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 상세 모달 -->
+<div class="modal-bg" id="detail-modal" onclick="closeModal(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('detail-modal').classList.remove('open')">✕</button>
+    <h3 id="modal-title">조사서 상세</h3>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ─── 설정 ──────────────────────────────────────
+const ADMIN_PW = '1234';   // ← 여기서 비밀번호 변경 가능
+const STORAGE_KEY = 'survey_submissions';
+
+// ─── 로그인 ────────────────────────────────────
+function doLogin(){
+  const pw = document.getElementById('pw-input').value;
+  if(pw === ADMIN_PW){
+    sessionStorage.setItem('admin_auth','1');
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('admin-screen').style.display='block';
+    renderAll();
+  } else {
+    document.getElementById('login-error').style.display='block';
+    document.getElementById('pw-input').value='';
+    document.getElementById('pw-input').focus();
+  }
+}
+
+function doLogout(){
+  sessionStorage.removeItem('admin_auth');
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('admin-screen').style.display='none';
+  document.getElementById('pw-input').value='';
+  document.getElementById('login-error').style.display='none';
+}
+
+window.addEventListener('load', ()=>{
+  if(sessionStorage.getItem('admin_auth')==='1'){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('admin-screen').style.display='block';
+    renderAll();
+  }
+});
+
+// ─── 데이터 ────────────────────────────────────
+function getData(){ return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); }
+
+// ─── 통계 ──────────────────────────────────────
+function renderStats(){
+  const data = getData();
+  const male   = data.filter(d=>d.gender==='남학생').length;
+  const female = data.filter(d=>d.gender==='여학생').length;
+  const schools= [...new Set(data.flatMap(d=>d.schools))].length;
+  document.getElementById('stats-area').innerHTML=`
+    <div class="stat-card blue"><div class="num">${data.length}</div><div class="lbl">총 제출 수</div></div>
+    <div class="stat-card purple"><div class="num">${male}</div><div class="lbl">남학생</div></div>
+    <div class="stat-card orange"><div class="num">${female}</div><div class="lbl">여학생</div></div>
+    <div class="stat-card green"><div class="num">${schools}</div><div class="lbl">언급된 학교 수</div></div>`;
+}
+
+// ─── 테이블 ────────────────────────────────────
+const COLORS=['#4F6DF5','#4F6DF5','#4F6DF5','#8B5CF6','#8B5CF6','#8B5CF6','#14B8A6','#14B8A6','#14B8A6'];
+function getColor(i){ return COLORS[Math.min(i,COLORS.length-1)]; }
+
+function renderTable(){
+  const q  = document.getElementById('search-input').value.toLowerCase();
+  const gf = document.getElementById('gender-filter').value;
+  let data = getData();
+  if(gf) data = data.filter(d=>d.gender===gf);
+  if(q)  data = data.filter(d=>
+    d.name.toLowerCase().includes(q) ||
+    d.schools.some(s=>s.toLowerCase().includes(q)) ||
+    (d.middle||'').toLowerCase().includes(q)
+  );
+
+  const tbody = document.getElementById('table-body');
+  const empty = document.getElementById('empty-msg');
+
+  if(data.length===0){ tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+
+  tbody.innerHTML = data.map((d,i)=>{
+    const chips = d.schools.slice(0,3).map(s=>`<span class="school-chip">${s}</span>`).join('')
+      + (d.schools.length>3?`<span class="school-chip">+${d.schools.length-3}</span>`:'');
+    const dt = new Date(d.submittedAt);
+    const timeStr = `${dt.getMonth()+1}/${dt.getDate()} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`;
+    const badge = d.gender==='남학생'?'<span class="badge badge-m">남</span>':'<span class="badge badge-f">여</span>';
+    return `<tr onclick="openModal(${d.id})">
+      <td style="color:var(--text-muted);font-size:12px;">${i+1}</td>
+      <td style="font-weight:700;">${d.name}</td>
+      <td>${badge}</td>
+      <td style="font-size:13px;">${d.classNum||'—'}</td>
+      <td style="font-size:13px;">${d.middle||'—'}</td>
+      <td><div class="school-chips">${chips||'—'}</div></td>
+      <td><span class="time-txt">${timeStr}</span></td>
+      <td onclick="event.stopPropagation()"><button class="del-btn" onclick="deleteOne(${d.id})" title="삭제">🗑</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderAll(){ renderStats(); renderTable(); }
+
+// ─── 상세 모달 ─────────────────────────────────
+function openModal(id){
+  const data = getData();
+  const d = data.find(x=>x.id===id);
+  if(!d) return;
+  document.getElementById('modal-title').textContent=`${d.name} 님의 조사서`;
+  const schoolList = d.schools.length
+    ? d.schools.map((s,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);">
+        <div style="width:22px;height:22px;border-radius:50%;background:${getColor(i)};color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">${i+1}</div>
+        <span style="font-size:14px;font-weight:500;">${s}</span></div>`).join('')
+    : '<p style="color:var(--text-muted);font-size:14px;padding:8px 0;">없음</p>';
+  const dt = new Date(d.submittedAt);
+  document.getElementById('modal-body').innerHTML=`
+    <div class="info-row"><span class="info-label">이름</span><span class="info-val">${d.name}</span></div>
+    <div class="info-row"><span class="info-label">성별</span><span class="info-val">${d.gender||'—'}</span></div>
+    <div class="info-row"><span class="info-label">학번</span><span class="info-val">${d.classNum||'—'}</span></div>
+    <div class="info-row"><span class="info-label">출신 중학교</span><span class="info-val">${d.middle||'—'}</span></div>
+    <div class="info-row"><span class="info-label">제출일시</span><span class="info-val">${dt.toLocaleString('ko-KR')}</span></div>
+    <div style="margin-top:16px;margin-bottom:8px;font-size:12px;font-weight:700;color:var(--text-muted);">희망 학교</div>
+    ${schoolList}
+    ${d.memo?`<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);"><div style="font-size:12px;color:var(--text-muted);margin-bottom:5px;">기타 의견</div><div style="font-size:14px;line-height:1.7;">${d.memo}</div></div>`:''}`;
+  document.getElementById('detail-modal').classList.add('open');
+}
+
+function closeModal(e){
+  if(e.target.id==='detail-modal') document.getElementById('detail-modal').classList.remove('open');
+}
+
+// ─── 삭제 ──────────────────────────────────────
+function deleteOne(id){
+  if(!confirm('이 항목을 삭제할까요?')) return;
+  const data = getData().filter(d=>d.id!==id);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  renderAll();
+}
+
+function clearAll(){
+  if(!confirm('제출된 조사서를 모두 삭제할까요?\n이 작업은 되돌릴 수 없습니다.')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  renderAll();
+}
+
+// ─── CSV 내보내기 ──────────────────────────────
+function exportCSV(){
+  const data = getData();
+  if(data.length===0){ alert('내보낼 데이터가 없습니다.'); return; }
+  const maxSchools = Math.max(...data.map(d=>d.schools.length));
+  const schoolHeaders = Array.from({length:maxSchools},(_,i)=>`희망학교${i+1}`).join(',');
+  const header = `이름,성별,학번,출신중학교,${schoolHeaders},기타의견,제출일시\n`;
+  const rows = data.map(d=>{
+    const schoolCols = Array.from({length:maxSchools},(_,i)=>d.schools[i]||'').map(s=>`"${s}"`).join(',');
+    const dt = new Date(d.submittedAt).toLocaleString('ko-KR');
+    return `"${d.name}","${d.gender||''}","${d.classNum||''}","${d.middle||''}",${schoolCols},"${d.memo||''}","${dt}"`;
+  }).join('\n');
+  const bom = '\uFEFF';
+  const blob = new Blob([bom+header+rows],{type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download='희망학교조사서_'+new Date().toLocaleDateString('ko-KR').replace(/\./g,'').replace(/ /g,'')+'.csv';
+  a.click(); URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>
