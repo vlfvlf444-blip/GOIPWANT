@@ -96,13 +96,8 @@ footer { text-align:center; padding:28px 16px; color:var(--text-muted); font-siz
     <div class="section-label">① 기본 정보</div>
     <div class="field-grid">
       <div>
-        <label>학년 <span class="req">*</span></label>
-        <select id="f-grade">
-          <option value="">선택</option>
-          <option value="1학년">1학년</option>
-          <option value="2학년">2학년</option>
-          <option value="3학년">3학년</option>
-        </select>
+        <label>학년</label>
+        <input type="text" id="f-grade" value="3학년" readonly style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Noto Sans KR',sans-serif;background:#F0F0F0;color:var(--text);outline:none;">
       </div>
       <div>
         <label>반 <span class="req">*</span></label>
@@ -133,7 +128,6 @@ footer { text-align:center; padding:28px 16px; color:var(--text-muted); font-siz
 
     <div class="btn-row">
       <button class="btn btn-submit" onclick="doSubmit()">✅ 제출하기</button>
-      <button class="btn btn-outline" onclick="doPrint()">🖨️ 인쇄하기</button>
       <button class="btn btn-reset" onclick="doReset()">↺</button>
     </div>
 
@@ -196,7 +190,6 @@ function collectData(){
 
 function doSubmit(){
   const d = collectData();
-  if(!d.grade){ alert('학년을 선택해주세요.'); document.getElementById('f-grade').focus(); return; }
   if(!d.classnum){ alert('반을 입력해주세요.'); document.getElementById('f-classnum').focus(); return; }
   if(!d.num){ alert('번호를 입력해주세요.'); document.getElementById('f-num').focus(); return; }
   if(!d.name){ alert('이름을 입력해주세요.'); document.getElementById('f-name').focus(); return; }
